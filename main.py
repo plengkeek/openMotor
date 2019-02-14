@@ -268,7 +268,8 @@ class Window(QMainWindow):
             self.comboBoxPropellant.setCurrentText(self.motor.propellant.getProperty("name"))
 
     def exit(self):
-        # Check for unsaved changes
+        #if self.checkUnsaved():
+        #    print(self.showdialog())
         sys.exit()
 
     def loadPreferences(self):
@@ -299,24 +300,7 @@ class Window(QMainWindow):
         self.preferencesWindow.show()
 
     def loadDefaultMotor(self):
-        self.motor = motorlib.motor()
-        bg = motorlib.batesGrain()
-        bg.setProperties({'diameter': 0.083058, 
-                  'length': 0.1397, 
-                  'coreDiameter': 0.03175, 
-                  'inhibitedEnds': 0
-                  })
-        bg2 = motorlib.batesGrain()
-        bg2.setProperties({'diameter': 0.083058, 
-                  'length': 0.1397, 
-                  'coreDiameter': 0.03175, 
-                  'inhibitedEnds': 0
-                  })
-        self.motor.grains.append(bg)
-        self.motor.grains.append(bg2)
-
-        self.motor.nozzle.setProperties({'throat': 0.014, 'exit': 0.03, 'efficiency': 0.9})
-        self.motor.propellant.setProperties({'name': 'Cherry Limeade', 'density': 1680, 'a': 3.517054143255937e-05, 'n': 0.3273, 't': 3500, 'm': 23.67, 'k': 1.21})
+        self.motor = uilib.defaultMotor()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
