@@ -67,7 +67,7 @@ class Window(QMainWindow):
         self.actionSave.triggered.connect(self.fileManager.save)
         self.actionSaveAs.triggered.connect(self.fileManager.saveAs)
         self.actionOpen.triggered.connect(self.loadMotor)
-        self.actionQuit.triggered.connect(self.exit)
+        self.actionQuit.triggered.connect(self.closeEvent)
 
         #Edit menu
         self.actionUndo.triggered.connect(self.undo)
@@ -297,9 +297,13 @@ class Window(QMainWindow):
         self.setupPropSelector()
         self.comboBoxPropellant.setCurrentText(cm.propellant.getProperty("name"))
 
-    def exit(self):
+    def closeEvent(self, event = None):
         if self.fileManager.unsavedCheck():
             sys.exit()
+        else:
+            if event is not None:
+                if type(event) is not bool:
+                    event.ignore()
 
     def loadPreferences(self):
         try:
