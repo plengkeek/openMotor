@@ -14,15 +14,15 @@ class fileManager(QObject):
 
         self.fileHistory = []
         self.currentVersion = 0
+        self.savedVersion = 0
 
-        self.saved = True
         self.fileName = None
 
     def newFile(self):
         if self.unsavedCheck():
             self.fileHistory = [defaults.defaultMotor().getDict()]
             self.currentVersion = 0
-            self.saved = True
+            self.savedVersion = 0
             self.fileName = None
 
     def save(self):
@@ -31,7 +31,7 @@ class fileManager(QObject):
         else:
             with open(self.fileName, 'w') as saveFile:
                 yaml.dump(self.fileHistory[self.currentVersion], saveFile)
-                self.saved = True
+                self.savedVersion = self.currentVersion
                 self.sendTitleUpdate()
 
     def saveAs(self):
@@ -45,9 +45,9 @@ class fileManager(QObject):
                 motorData = yaml.load(loadFile)
                 self.fileHistory = [motorData]
                 self.currentVersion = 0
+                self.savedVersion = 0
                 self.fileName = path
                 self.sendTitleUpdate()
-                self.saved = True
 
     def getCurrentMotor(self):
         nm = motorlib.motor()
@@ -59,7 +59,6 @@ class fileManager(QObject):
             del self.fileHistory[self.currentVersion + 1:]
         self.fileHistory.append(motor.getDict())
         self.currentVersion += 1
-        self.saved = False
         self.sendTitleUpdate()
 
     def canUndo(self):
@@ -68,6 +67,7 @@ class fileManager(QObject):
     def undo(self):
         if self.canUndo():
             self.currentVersion -= 1
+            self.sendTitleUpdate()
 
     def canRedo(self):
         return self.currentVersion < len(self.fileHistory) - 1
@@ -75,9 +75,10 @@ class fileManager(QObject):
     def redo(self):
         if self.canRedo():
             self.currentVersion += 1
+            self.sendTitleUpdate()
 
     def unsavedCheck(self):
-        if not self.saved:
+        if self.savedVersion != self.currentVersion:
             msg = QMessageBox()
 
             msg.setText("The current file has unsaved changes. Close without saving?")
@@ -96,7 +97,7 @@ class fileManager(QObject):
         return True
 
     def sendTitleUpdate(self):
-        self.fileNameChanged.emit(self.fileName, self.saved)
+        self.fileNameChanged.emit(self.fileName, self.savedVersion == self.currentVersion)
 
     def showSaveDialog(self):
         path = QFileDialog.getSaveFileName(None, 'Save motor', '', 'Motor Files (*.ric)')[0]

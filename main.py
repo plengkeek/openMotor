@@ -265,12 +265,16 @@ class Window(QMainWindow):
     def undo(self):
         self.fileManager.undo()
         self.updateGrainTable()
-        #update prop chooser
+        self.checkGrainSelection()
+        cm = self.fileManager.getCurrentMotor()
+        self.comboBoxPropellant.setCurrentText(cm.propellant.getProperty("name"))
 
     def redo(self):
         self.fileManager.redo()
         self.updateGrainTable()
-        #update prop chooser
+        self.checkGrainSelection()
+        cm = self.fileManager.getCurrentMotor()
+        self.comboBoxPropellant.setCurrentText(cm.propellant.getProperty("name"))
 
     def newMotor(self):
         #Check for unsaved changes
